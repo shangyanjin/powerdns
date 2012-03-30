@@ -232,7 +232,8 @@ protected:
   string getRemote(DNSPacket *p);
   bool getRemote(DNSPacket *p, struct sockaddr *in, Utility::socklen_t *len);
 
-private:
+// private:
+public:
   string d_prefix;
 };
 
@@ -261,7 +262,7 @@ class BackendMakerClass
 public:
   void report(BackendFactory *bf);
   void launch(const string &instr);
-  vector<DNSBackend *>all(bool skipBIND=false);
+  vector<DNSBackend *>all(bool skipBIND=false, const string &prefix="");
   void load(const string &module);
   int numLauncheable();
   vector<string> getModules();
