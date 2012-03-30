@@ -26,7 +26,9 @@ gMySQLBackend::gMySQLBackend(const string &mode, const string &suffix)  : GSQLBa
         	     getArgAsNum("port"),
         	     getArg("socket"),
         	     getArg("user"),
-        	     getArg("password")));
+        	     getArg("password"),
+               getArgAsNum("timeout")));
+               // 10));
     
   }
   
@@ -51,6 +53,8 @@ public:
     declare(suffix,"socket","Pdns backend socket to connect to","");
     declare(suffix,"password","Pdns backend password to connect with","");
     declare(suffix,"dnssec","Assume DNSSEC Schema is in place","no");
+    declare(suffix,"timeout","Query timeout","10");
+    declare(suffix,"gracetime","Ignore queries for this long after noticing a timeout","0");
 
     declare(suffix,"basic-query","Basic query","select content,ttl,prio,type,domain_id,name from records where type='%s' and name='%s'");
     declare(suffix,"id-query","Basic with ID query","select content,ttl,prio,type,domain_id,name from records where type='%s' and name='%s' and domain_id=%d");

@@ -14,7 +14,7 @@ bool SMySQL::s_dolog;
 pthread_mutex_t SMySQL::s_myinitlock = PTHREAD_MUTEX_INITIALIZER;
 
 SMySQL::SMySQL(const string &database, const string &host, uint16_t port, const string &msocket, const string &user, 
-               const string &password)
+               const string &password, unsigned int timeout)
 {
   {
     Lock l(&s_myinitlock);
@@ -26,21 +26,24 @@ SMySQL::SMySQL(const string &database, const string &host, uint16_t port, const 
     mysql_options(&d_db, MYSQL_OPT_RECONNECT, &reconnect);
   #endif
 
-  #if MYSQL_VERSION_ID > 51000
-    unsigned int timeout = 10;
-    mysql_options(&d_db, MYSQL_OPT_READ_TIMEOUT, &timeout);
-    mysql_options(&d_db, MYSQL_OPT_WRITE_TIMEOUT, &timeout);
-  #endif
-    
-    if (!mysql_real_connect(&d_db, host.empty() ? 0 : host.c_str(), 
-          		  user.empty() ? 0 : user.c_str(), 
-          		  password.empty() ? 0 : password.c_str(),
-          		  database.c_str(), port,
-          		  msocket.empty() ? 0 : msocket.c_str(),
-          		  CLIENT_MULTI_RESULTS)) {
+  cerr<<"about to set mysql timeouts"<<endl;
+  cerr<<"MYSQL_VERSION_ID: "<<MYSQL_VERSION_ID<<endl;
+#if MYSQL_VERSION_ID > 50100
+  cerr<<"setting mysql timeouts!"<<endl;
+  mysql_options(&d_db, MYSQL_OPT_CONNECT_TIMEOUT, &timeout);
+  mysql_options(&d_db, MYSQL_OPT_READ_TIMEOUT, &timeout);
+  mysql_options(&d_db, MYSQL_OPT_WRITE_TIMEOUT, &timeout);
+#endif
+  
+  if (!mysql_real_connect(&d_db, host.empty() ? 0 : host.c_str(), 
+        		  user.empty() ? 0 : user.c_str(), 
+        		  password.empty() ? 0 : password.c_str(),
+        		  database.c_str(), port,
+        		  msocket.empty() ? 0 : msocket.c_str(),
+        		  CLIENT_MULTI_RESULTS)) {
 
-      throw sPerrorException("Unable to connect to database");
-    }
+    throw sPerrorException("Unable to connect to database");
+  }
 
     d_rres=0;
   }
