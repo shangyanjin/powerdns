@@ -112,4 +112,5 @@ private:
 
 protected:  
   bool d_dnssecQueries;
+  bool d_readonly;
 };
